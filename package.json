@@ -1,0 +1,21 @@
+{
+  "name": "parser",
+  "version": "1.0.0",
+  "description": "",
+  "main": "parser.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Vy/Peter",
+  "license": "ISC",
+  "dependencies": {
+    "@types/node": "^12.0.12",
+    "@types/readline-sync": "^1.4.3",
+    "pants": "file:pants",
+    "readline": "^1.3.0",
+    "readline-sync": "^1.4.9",
+    "require": "^2.4.20",
+    "save": "^2.4.0",
+    "space-lift": "^0.8.7"
+  }
+}
