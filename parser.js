@@ -15,7 +15,7 @@ let variableParse = Prims.right(keyWordParser)(Prims.appfun(Prims.many1(Prims.le
 let numberParser = Prims.appfun(Prims.between(Prims.ws())(Prims.ws())(Prims.many1(Prims.digit())))((digitarray) => new NumberNode_1.NumberNode(parseFloat(digitarray.join(""))));
 let assignParser = Prims.seq(Prims.left(variableParse)(Prims.right(Prims.ws())(Prims.char('='))))(Prims.right(Prims.ws())(numberParser))((tup) => new AssignOp_1.AssignOp(tup[0], tup[1]));
 let multiVariableparser = Prims.seq(variableParse)(Prims.many(Prims.right(Prims.char(","))(variableParse)))((tup) => [tup[0]].concat(tup[1]));
-let fooParser = Prims.debug(Prims.seq(Prims.right(Prims.ws())(Prims.str("foo")))(Prims.between(Prims.char("("))(Prims.char(")"))(multiVariableparser))((tup) => new Foo_1.Foo(tup[1])))("fooParser");
+let fooParser = Prims.seq(Prims.right(Prims.ws())(Prims.str("foo")))(Prims.between(Prims.char("("))(Prims.char(")"))(multiVariableparser))((tup) => new Foo_1.Foo(tup[1]));
 // let multiNumberParser : Prims.IParser<NumberNode[]> =
 //     Prims.seq<NumberNode, NumberNode[], NumberNode[]>(
 //         numberParser
@@ -51,6 +51,7 @@ const r1 = readLine.createInterface({
 r1.question("Type in your code to parse: ", (answer) => {
     // console.log(parse(answer).get());
     let outcome = multiParser(new CharStream(answer));
+    console.log(outcome);
     if (outcome instanceof Prims.Failure) {
         console.log(outcome.error.toString());
     }

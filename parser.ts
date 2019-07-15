@@ -75,7 +75,6 @@ let multiVariableparser : Prims.IParser<VariableNode[]> =
     )
 
 let fooParser : Prims.IParser<Foo> =
-    Prims.debug(
     Prims.seq<CharStream, VariableNode[], Foo>(
         Prims.right<CharStream, CharStream>(Prims.ws())(Prims.str("foo"))
     )(
@@ -88,7 +87,7 @@ let fooParser : Prims.IParser<Foo> =
         )
     )(
         (tup : [CharStream, VariableNode[]]) => new Foo(tup[1])
-))("fooParser");
+    );
 
 // let multiNumberParser : Prims.IParser<NumberNode[]> =
 //     Prims.seq<NumberNode, NumberNode[], NumberNode[]>(
@@ -177,7 +176,7 @@ r1.question("Type in your code to parse: ", (answer : string) => {
 
     // console.log(parse(answer).get());
     let outcome = multiParser(new CharStream(answer));
-
+    console.log(outcome);
     if (outcome instanceof Prims.Failure) {
          console.log(outcome.error.toString());
     }
