@@ -11,7 +11,7 @@
   "dependencies": {
     "@types/node": "^12.0.12",
     "@types/readline-sync": "^1.4.3",
-    "pants": "file:pants",
+    "pants": "file:../pants",
     "readline": "^1.3.0",
     "readline-sync": "^1.4.9",
     "require": "^2.4.20",

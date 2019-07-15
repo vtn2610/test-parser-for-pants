@@ -1,6 +1,9 @@
-export class VariableNode {
+import { Expression } from "./Expression";
+
+export class VariableNode extends Expression {
     private _value : string;
     constructor(val : string) {
+        super();
         this._value = val;
     }
 
