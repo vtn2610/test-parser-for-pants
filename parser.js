@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const pants_1 = require("pants");
+const lib_1 = require("../pants/lib");
 const AssignOp_1 = require("./AssignOp");
 const NumberNode_1 = require("./NumberNode");
 const VariableNode_1 = require("./VariableNode");
@@ -8,23 +8,16 @@ const PlusOp_1 = require("./PlusOp");
 const MinusOp_1 = require("./MinusOp");
 const ListNode_1 = require("./ListNode");
 const Foo_1 = require("./Foo");
-var Prims = pants_1.Primitives;
-var CharStream = pants_1.CharUtil.CharStream;
+var Prims = lib_1.Primitives;
+var CharStream = lib_1.CharUtil.CharStream;
 let keyWordParser = Prims.seq(Prims.right(Prims.ws())(Prims.str("var")))(Prims.ws1())((tup) => CharStream.concat([tup[0], tup[1]]));
 let variableParse = Prims.right(keyWordParser)(Prims.appfun(Prims.many1(Prims.letter()))((ltr) => new VariableNode_1.VariableNode(ltr.join(""))));
 let numberParser = Prims.appfun(Prims.between(Prims.ws())(Prims.ws())(Prims.many1(Prims.digit())))((digitarray) => new NumberNode_1.NumberNode(parseFloat(digitarray.join(""))));
 let assignParser = Prims.seq(Prims.left(variableParse)(Prims.right(Prims.ws())(Prims.char('='))))(Prims.right(Prims.ws())(numberParser))((tup) => new AssignOp_1.AssignOp(tup[0], tup[1]));
 let multiVariableparser = Prims.seq(variableParse)(Prims.many(Prims.right(Prims.char(","))(variableParse)))((tup) => [tup[0]].concat(tup[1]));
 let fooParser = Prims.seq(Prims.right(Prims.ws())(Prims.str("foo")))(Prims.between(Prims.char("("))(Prims.char(")"))(multiVariableparser))((tup) => new Foo_1.Foo(tup[1]));
-// let multiNumberParser : Prims.IParser<NumberNode[]> =
-//     Prims.seq<NumberNode, NumberNode[], NumberNode[]>(
-//         numberParser
-//     )(
-//         Prims.many(Prims.right<CharStream, NumberNode>(Prims.char(","))(numberParser))
-//     )(
-//         (tup : [NumberNode, NumberNode[]]) => [tup[0]].concat(tup[1])
-//     )
-let listParser = Prims.seq(Prims.right(Prims.ws())(Prims.char("[")))(Prims.many(Prims.right(Prims.char(","))(numberParser)))((tup) => new ListNode_1.ListNode(tup[1]));
+let multiNumberParser = Prims.seq(numberParser)(Prims.many(Prims.right(Prims.char(","))(numberParser)))((tup) => [tup[0]].concat(tup[1]));
+let listParser = Prims.appfun(Prims.between(Prims.right(Prims.ws())(Prims.char("[")))(Prims.char("]"))(multiNumberParser))((tup) => new ListNode_1.ListNode(tup));
 let plusParser = Prims.seq(numberParser)(Prims.right(Prims.char("+"))(numberParser))((tup) => new PlusOp_1.PlusOp(tup[0], tup[1]));
 let minusParser = Prims.seq(numberParser)(Prims.right(Prims.char("-"))(numberParser))((tup) => new MinusOp_1.MinusOp(tup[0], tup[1]));
 let betweenParser = Prims.between(Prims.char("("))(Prims.char(")"))(numberParser);

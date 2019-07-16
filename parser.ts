@@ -1,4 +1,4 @@
-import { Primitives, CharUtil } from 'pants';
+import { Primitives, CharUtil } from '../pants/lib';
 import { AssignOp } from "./AssignOp";
 import { Expression } from "./Expression";
 import { NumberNode } from "./NumberNode";
@@ -89,22 +89,26 @@ let fooParser : Prims.IParser<Foo> =
         (tup : [CharStream, VariableNode[]]) => new Foo(tup[1])
     );
 
-// let multiNumberParser : Prims.IParser<NumberNode[]> =
-//     Prims.seq<NumberNode, NumberNode[], NumberNode[]>(
-//         numberParser
-//     )(
-//         Prims.many(Prims.right<CharStream, NumberNode>(Prims.char(","))(numberParser))
-//     )(
-//         (tup : [NumberNode, NumberNode[]]) => [tup[0]].concat(tup[1])
-//     )
-
-let listParser : Prims.IParser<ListNode> =
-    Prims.seq<CharStream, NumberNode[], ListNode>(
-        Prims.right<CharStream, CharStream>(Prims.ws())(Prims.char("["))
+let multiNumberParser : Prims.IParser<NumberNode[]> =
+    Prims.seq<NumberNode, NumberNode[], NumberNode[]>(
+        numberParser
     )(
         Prims.many(Prims.right<CharStream, NumberNode>(Prims.char(","))(numberParser))
     )(
-        (tup : [CharStream, NumberNode[]]) => new ListNode(tup[1])
+        (tup : [NumberNode, NumberNode[]]) => [tup[0]].concat(tup[1])
+    )
+
+let listParser : Prims.IParser<ListNode> =
+    Prims.appfun<NumberNode[], ListNode>(
+        Prims.between<CharStream, CharStream, NumberNode[]>(
+            Prims.right<CharStream, CharStream>(Prims.ws())(Prims.char("["))
+        )(
+            Prims.char("]")
+        )(
+            multiNumberParser
+        )
+    )(
+        (tup : NumberNode[]) => new ListNode(tup)
     )
 
 let plusParser : Prims.IParser<PlusOp> = 
