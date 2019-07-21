@@ -12,6 +12,9 @@ class NumberNode extends Expression_1.Expression {
     set val(newNum) {
         this._num = newNum;
     }
+    eval() {
+        return this._num;
+    }
 }
 exports.NumberNode = NumberNode;
 //# sourceMappingURL=NumberNode.js.map

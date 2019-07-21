@@ -9,7 +9,7 @@ class VariableNode extends Expression_1.Expression {
     set val(newVal) {
         this._value = newVal;
     }
-    get val() {
+    eval() {
         return this._value;
     }
     toString() {

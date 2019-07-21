@@ -11,7 +11,7 @@ export class VariableNode extends Expression {
         this._value = newVal;
     }
 
-    get val() : string {
+    eval() : string {
         return this._value;
     }
 

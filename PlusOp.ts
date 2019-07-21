@@ -11,4 +11,8 @@ export class PlusOp extends Expression {
         this._left = left;
         this._right = right;
     }
+    
+    eval() {
+        return new NumberNode(this._left.eval() + this._right.eval());
+    }
 }

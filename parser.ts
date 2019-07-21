@@ -44,8 +44,26 @@ let numberParser : Prims.IParser<NumberNode> =
         (digitarray : CharStream[]) => new NumberNode(parseFloat(digitarray.join("")))
     )
 
+    let plusParser : Prims.IParser<PlusOp> = 
+    Prims.seq<NumberNode, NumberNode, PlusOp>(
+        numberParser
+    )(
+        Prims.right<CharStream, NumberNode>(Prims.char("+"))(numberParser)
+    )(
+        (tup : [NumberNode, NumberNode]) => new PlusOp(tup[0], tup[1])
+    )
+
+let minusParser : Prims.IParser<MinusOp> = 
+    Prims.seq<NumberNode, NumberNode, MinusOp>(
+        numberParser
+    )(
+        Prims.right<CharStream, NumberNode>(Prims.char("-"))(numberParser)
+    )(
+        (tup : [NumberNode, NumberNode]) => new MinusOp(tup[0], tup[1])
+    )
+
 let assignParser : Prims.IParser<AssignOp> = 
-    Prims.seq<VariableNode, NumberNode, AssignOp>(
+    Prims.seq<VariableNode, Expression, AssignOp>(
         Prims.left<VariableNode, CharStream>(
             variableParse
         )(
@@ -56,13 +74,9 @@ let assignParser : Prims.IParser<AssignOp> =
             )
         )
     )(
-        Prims.right<CharStream, NumberNode>(
-            Prims.ws()
-        )(
-            numberParser
-        )
+        Prims.choices<Expression>(plusParser, minusParser, numberParser)
     )(
-        (tup : [VariableNode, NumberNode]) => new AssignOp(tup[0], tup[1])
+        (tup : [VariableNode, Expression]) => new AssignOp(tup[0], tup[1])
     )
 
 let multiVariableparser : Prims.IParser<VariableNode[]> =
@@ -101,32 +115,14 @@ let multiNumberParser : Prims.IParser<NumberNode[]> =
 let listParser : Prims.IParser<ListNode> =
     Prims.appfun<NumberNode[], ListNode>(
         Prims.between<CharStream, CharStream, NumberNode[]>(
-            Prims.right<CharStream, CharStream>(Prims.ws())(Prims.char("["))
+            Prims.char('(')
         )(
-            Prims.char("]")
+            Prims.char(')')
         )(
             multiNumberParser
         )
     )(
         (tup : NumberNode[]) => new ListNode(tup)
-    )
-
-let plusParser : Prims.IParser<PlusOp> = 
-    Prims.seq<NumberNode, NumberNode, PlusOp>(
-        numberParser
-    )(
-        Prims.right<CharStream, NumberNode>(Prims.char("+"))(numberParser)
-    )(
-        (tup : [NumberNode, NumberNode]) => new PlusOp(tup[0], tup[1])
-    )
-
-let minusParser : Prims.IParser<MinusOp> = 
-    Prims.seq<NumberNode, NumberNode, MinusOp>(
-        numberParser
-    )(
-        Prims.right<CharStream, NumberNode>(Prims.char("-"))(numberParser)
-    )(
-        (tup : [NumberNode, NumberNode]) => new MinusOp(tup[0], tup[1])
     )
 
 let betweenParser : Prims.IParser<NumberNode> = 
@@ -153,7 +149,7 @@ let leftParser : Prims.IParser<NumberNode> =
     )
 
 let multiParser : Prims.IParser<Expression> =
-    Prims.choices<Expression>(fooParser, listParser, assignParser, plusParser, minusParser, betweenParser)
+    Prims.choices<Expression>(fooParser, listParser, assignParser, minusParser, plusParser, betweenParser);
 
 // function parse(program : string): Option<Expression> {
 //     let o = multiParser(new CharStream(program));
@@ -172,17 +168,24 @@ const r1 = readLine.createInterface({
     output : process.stdout
 })
 
-// function grammar() {
-//     return Prims.right(fooParser)(Prims.eof());
-// }
+function grammar() {
+    return Prims.right(multiParser)(Prims.eof());
+}
 
 r1.question("Type in your code to parse: ", (answer : string) => {
 
     // console.log(parse(answer).get());
-    let outcome = multiParser(new CharStream(answer));
-    console.log(outcome);
+    console.time("start");
+    let outcome = grammar()(new CharStream(answer));
+    console.timeEnd("start");
+    //console.log("assignParser");
+    //Prims.LCSParse(listParser, 0, new CharStream(answer));
+    // console.log("betweenParser");
+    // Prims.LCSParse(betweenParser, 0, new CharStream("(2222222 "));
+    //console.log(outcome);
     if (outcome instanceof Prims.Failure) {
          console.log(outcome.error.toString());
+         console.log(new Translator(outcome.error).toString());
     }
     
     //let outcome = Prims.strSat(["hello","hi"])(new CharStream("hiytutuy"));

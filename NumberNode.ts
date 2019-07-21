@@ -1,6 +1,7 @@
 import { Expression } from "./Expression";
+import { BinOp } from "./BinOp";
 
-export class NumberNode extends Expression {
+export class NumberNode extends Expression{
     protected _num : number;
 
     constructor(num : number) {
@@ -14,5 +15,9 @@ export class NumberNode extends Expression {
 
     set val(newNum : number) {
         this._num = newNum;
+    }
+
+    eval() {
+        return this._num;
     }
 }
