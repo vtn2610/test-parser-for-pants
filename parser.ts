@@ -12,7 +12,7 @@ import CharStream = CharUtil.CharStream;
 import { Option, Some, None, tuple } from 'space-lift';
 import { Translator } from "../pants/lib/Errors/Translator";
 
-let keyWordParser : Prims.IParser<CharStream> =
+let varWordParser : Prims.IParser<CharStream> =
     Prims.seq<CharStream, CharStream, CharStream>(
         Prims.right<CharStream, CharStream>(Prims.ws())(Prims.str("var"))
     )(
@@ -22,7 +22,7 @@ let keyWordParser : Prims.IParser<CharStream> =
 
 let variableParse : Prims.IParser<VariableNode> =
     Prims.right<CharStream, VariableNode>(
-        keyWordParser
+        varWordParser
     )(
         Prims.appfun<CharStream[],VariableNode>(
             Prims.many1(Prims.letter())
@@ -172,20 +172,33 @@ function grammar() {
     return Prims.right(multiParser)(Prims.eof());
 }
 
+let input = "xy"
+let test = new CharStream(input);
+let parse = Prims.str("xyz")(test)
+if (parse instanceof Prims.Failure) {
+    let out : [number, CharStream] = Prims.editParse(Prims.str("xyz"),test,0,parse.error.expectedStr().length,[])
+    console.log(out);
+    console.log("Failure, corrected string: " + out[1].toString())
+}
+else{
+    console.log("Success :" + parse)
+}
+/*
 r1.question("Type in your code to parse: ", (answer : string) => {
 
     // console.log(parse(answer).get());
     console.time("start");
-    let outcome = grammar()(new CharStream(answer));
+    let outcome = a(new CharStream(answer));
     console.timeEnd("start");
     //console.log("assignParser");
     //Prims.LCSParse(listParser, 0, new CharStream(answer));
     // console.log("betweenParser");
     // Prims.LCSParse(betweenParser, 0, new CharStream("(2222222 "));
-    //console.log(outcome);
+    console.log(outcome);
     if (outcome instanceof Prims.Failure) {
-         console.log(outcome.error.toString());
-         console.log(new Translator(outcome.error).toString());
+        console.log(Prims.editParse(a,new CharStream(answer),0,outcome.error.expectedStr().length,[]));
+        console.log(outcome.error.toString());
+        console.log(new Translator(outcome.error).toString());
     }
     
     //let outcome = Prims.strSat(["hello","hi"])(new CharStream("hiytutuy"));
@@ -199,4 +212,6 @@ r1.question("Type in your code to parse: ", (answer : string) => {
     //     //console.log(outcome.error_pos);
 
     r1.close();
-});
+}
+);
+*/

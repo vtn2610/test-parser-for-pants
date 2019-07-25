@@ -10,13 +10,12 @@ const ListNode_1 = require("./ListNode");
 const Foo_1 = require("./Foo");
 var Prims = lib_1.Primitives;
 var CharStream = lib_1.CharUtil.CharStream;
-const Translator_1 = require("../pants/lib/Errors/Translator");
-let keyWordParser = Prims.seq(Prims.right(Prims.ws())(Prims.str("var")))(Prims.ws1())((tup) => CharStream.concat([tup[0], tup[1]]));
-let variableParse = Prims.right(keyWordParser)(Prims.appfun(Prims.many1(Prims.letter()))((ltr) => new VariableNode_1.VariableNode(ltr.join(""))));
+let varWordParser = Prims.seq(Prims.right(Prims.ws())(Prims.str("var")))(Prims.ws1())((tup) => CharStream.concat([tup[0], tup[1]]));
+let variableParse = Prims.right(varWordParser)(Prims.appfun(Prims.many1(Prims.letter()))((ltr) => new VariableNode_1.VariableNode(ltr.join(""))));
 let numberParser = Prims.appfun(Prims.between(Prims.ws())(Prims.ws())(Prims.many1(Prims.digit())))((digitarray) => new NumberNode_1.NumberNode(parseFloat(digitarray.join(""))));
 let plusParser = Prims.seq(numberParser)(Prims.right(Prims.char("+"))(numberParser))((tup) => new PlusOp_1.PlusOp(tup[0], tup[1]));
 let minusParser = Prims.seq(numberParser)(Prims.right(Prims.char("-"))(numberParser))((tup) => new MinusOp_1.MinusOp(tup[0], tup[1]));
-let assignParser = Prims.seq(Prims.left(variableParse)(Prims.right(Prims.ws())(Prims.char('='))))(Prims.choices(plusParser, minusParser))((tup) => new AssignOp_1.AssignOp(tup[0], tup[1]));
+let assignParser = Prims.seq(Prims.left(variableParse)(Prims.right(Prims.ws())(Prims.char('='))))(Prims.choices(plusParser, minusParser, numberParser))((tup) => new AssignOp_1.AssignOp(tup[0], tup[1]));
 let multiVariableparser = Prims.seq(variableParse)(Prims.many(Prims.right(Prims.char(","))(variableParse)))((tup) => [tup[0]].concat(tup[1]));
 let fooParser = Prims.seq(Prims.right(Prims.ws())(Prims.str("foo")))(Prims.between(Prims.char("("))(Prims.char(")"))(multiVariableparser))((tup) => new Foo_1.Foo(tup[1]));
 let multiNumberParser = Prims.seq(numberParser)(Prims.many(Prims.right(Prims.char(","))(numberParser)))((tup) => [tup[0]].concat(tup[1]));
@@ -42,27 +41,47 @@ const r1 = readLine.createInterface({
 function grammar() {
     return Prims.right(multiParser)(Prims.eof());
 }
-r1.question("Type in your code to parse: ", (answer) => {
+let input = "xy";
+let test = new CharStream(input);
+let parse = Prims.str("xyz")(test);
+if (parse instanceof Prims.Failure) {
+    let out = Prims.editParse(Prims.str("xyz"), test, 0, parse.error.expectedStr().length, []);
+    console.log(out);
+    console.log("Failure, corrected string: " + out[1].toString());
+}
+else {
+    console.log("Success :" + parse);
+}
+/*
+r1.question("Type in your code to parse: ", (answer : string) => {
+
     // console.log(parse(answer).get());
     console.time("start");
-    let outcome = grammar()(new CharStream(answer));
+    let outcome = a(new CharStream(answer));
     console.timeEnd("start");
     //console.log("assignParser");
     //Prims.LCSParse(listParser, 0, new CharStream(answer));
     // console.log("betweenParser");
     // Prims.LCSParse(betweenParser, 0, new CharStream("(2222222 "));
-    //console.log(outcome);
+    console.log(outcome);
     if (outcome instanceof Prims.Failure) {
+        console.log(Prims.editParse(a,new CharStream(answer),0,outcome.error.expectedStr().length,[]));
         console.log(outcome.error.toString());
-        console.log(new Translator_1.Translator(outcome.error).toString());
+        console.log(new Translator(outcome.error).toString());
     }
+    
     //let outcome = Prims.strSat(["hello","hi"])(new CharStream("hiytutuy"));
     // let outcome3 = Prims.strSat(["hello","hi"])(new CharStream("ddddhellu"));
+
     // let outcome = grammar()(new CharStream(answer));
+    
     // console.log(outcome);
     // if (outcome instanceof Prims.Failure) {
     //      console.log((new Translator(outcome.error)).toString());
     //     //console.log(outcome.error_pos);
+
     r1.close();
-});
+}
+);
+*/
 //# sourceMappingURL=parser.js.map
