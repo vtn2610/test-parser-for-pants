@@ -51,7 +51,7 @@ function grammar() {
 let input = "";
 let test = new CharStream(input);
 //let parse = Prims.choice(Prims.str("happy"))(Prims.str("sad"))(test)
-let parse = Prims.char("a")(test);
+let parse = Prims.seq(Prims.char("a"))(Prims.char("b"))(tup => tup[0].concat(tup[1]))(test);
 if (parse instanceof Prims.Failure) {
     //let out : [number, CharStream] = Prims.editParse(Prims.str("xyz"),test,0,parse.error.expectedStr().length,[])
     console.log(parse);
