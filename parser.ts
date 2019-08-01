@@ -33,11 +33,13 @@ let variableParse : Prims.IParser<VariableNode> =
 
 let numberParser : Prims.IParser<NumberNode> = 
     Prims.appfun<CharStream[], NumberNode>(
+        /*
         Prims.between<CharStream, CharStream, CharStream[]>(
             Prims.ws()
         )(
             Prims.ws()
-        )(
+        )
+        */(
             Prims.many1(Prims.digit())
         )
     )(
@@ -172,16 +174,19 @@ function grammar() {
     return Prims.right(multiParser)(Prims.eof());
 }
 
-let input = "xy"
+let input = ""
 let test = new CharStream(input);
-let parse = Prims.str("xyz")(test)
+//let parse = Prims.choice(Prims.str("happy"))(Prims.str("sad"))(test)
+let parse = Prims.char("a")(test);
 if (parse instanceof Prims.Failure) {
-    let out : [number, CharStream] = Prims.editParse(Prims.str("xyz"),test,0,parse.error.expectedStr().length,[])
-    console.log(out);
-    console.log("Failure, corrected string: " + out[1].toString())
+    //let out : [number, CharStream] = Prims.editParse(Prims.str("xyz"),test,0,parse.error.expectedStr().length,[])
+    console.log(parse);
+    console.log(parse.errors[0].modStream)
+    //console.log("Failure, corrected string: " + out[1].toString())
 }
 else{
-    console.log("Success :" + parse)
+    console.log("Success")
+    console.log(parse)
 }
 /*
 r1.question("Type in your code to parse: ", (answer : string) => {

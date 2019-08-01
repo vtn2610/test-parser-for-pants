@@ -12,7 +12,14 @@ var Prims = lib_1.Primitives;
 var CharStream = lib_1.CharUtil.CharStream;
 let varWordParser = Prims.seq(Prims.right(Prims.ws())(Prims.str("var")))(Prims.ws1())((tup) => CharStream.concat([tup[0], tup[1]]));
 let variableParse = Prims.right(varWordParser)(Prims.appfun(Prims.many1(Prims.letter()))((ltr) => new VariableNode_1.VariableNode(ltr.join(""))));
-let numberParser = Prims.appfun(Prims.between(Prims.ws())(Prims.ws())(Prims.many1(Prims.digit())))((digitarray) => new NumberNode_1.NumberNode(parseFloat(digitarray.join(""))));
+let numberParser = Prims.appfun(
+/*
+Prims.between<CharStream, CharStream, CharStream[]>(
+    Prims.ws()
+)(
+    Prims.ws()
+)
+*/ (Prims.many1(Prims.digit())))((digitarray) => new NumberNode_1.NumberNode(parseFloat(digitarray.join(""))));
 let plusParser = Prims.seq(numberParser)(Prims.right(Prims.char("+"))(numberParser))((tup) => new PlusOp_1.PlusOp(tup[0], tup[1]));
 let minusParser = Prims.seq(numberParser)(Prims.right(Prims.char("-"))(numberParser))((tup) => new MinusOp_1.MinusOp(tup[0], tup[1]));
 let assignParser = Prims.seq(Prims.left(variableParse)(Prims.right(Prims.ws())(Prims.char('='))))(Prims.choices(plusParser, minusParser, numberParser))((tup) => new AssignOp_1.AssignOp(tup[0], tup[1]));
@@ -41,16 +48,19 @@ const r1 = readLine.createInterface({
 function grammar() {
     return Prims.right(multiParser)(Prims.eof());
 }
-let input = "xy";
+let input = "";
 let test = new CharStream(input);
-let parse = Prims.str("xyz")(test);
+//let parse = Prims.choice(Prims.str("happy"))(Prims.str("sad"))(test)
+let parse = Prims.char("a")(test);
 if (parse instanceof Prims.Failure) {
-    let out = Prims.editParse(Prims.str("xyz"), test, 0, parse.error.expectedStr().length, []);
-    console.log(out);
-    console.log("Failure, corrected string: " + out[1].toString());
+    //let out : [number, CharStream] = Prims.editParse(Prims.str("xyz"),test,0,parse.error.expectedStr().length,[])
+    console.log(parse);
+    console.log(parse.errors[0].modStream);
+    //console.log("Failure, corrected string: " + out[1].toString())
 }
 else {
-    console.log("Success :" + parse);
+    console.log("Success");
+    console.log(parse);
 }
 /*
 r1.question("Type in your code to parse: ", (answer : string) => {
