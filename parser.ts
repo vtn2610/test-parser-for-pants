@@ -9,8 +9,6 @@ import { ListNode } from "./ListNode";
 import { Foo } from "./Foo";
 import Prims = Primitives;
 import CharStream = CharUtil.CharStream;
-import { Option, Some, None, tuple } from 'space-lift';
-import { Translator } from "../pants/lib/Errors/Translator";
 
 let varWordParser : Prims.IParser<CharStream> =
     Prims.seq<CharStream, CharStream, CharStream>(
@@ -117,9 +115,9 @@ let multiNumberParser : Prims.IParser<NumberNode[]> =
 let listParser : Prims.IParser<ListNode> =
     Prims.appfun<NumberNode[], ListNode>(
         Prims.between<CharStream, CharStream, NumberNode[]>(
-            Prims.char('(')
+            Prims.char('[')
         )(
-            Prims.char(')')
+            Prims.char(']')
         )(
             multiNumberParser
         )
@@ -174,36 +172,20 @@ function grammar() {
     return Prims.right(multiParser)(Prims.eof());
 }
 
-let input = ""
-let test = new CharStream(input);
-//let parse = Prims.choice(Prims.str("happy"))(Prims.str("sad"))(test)
-let parse = Prims.seq<CharStream,CharStream,CharStream>(Prims.char("a"))(Prims.char("b"))(tup => tup[0].concat(tup[1]))(test);
-if (parse instanceof Prims.Failure) {
-    //let out : [number, CharStream] = Prims.editParse(Prims.str("xyz"),test,0,parse.error.expectedStr().length,[])
-    console.log(parse);
-    console.log(parse.errors[0].modStream)
-    //console.log("Failure, corrected string: " + out[1].toString())
-}
-else{
-    console.log("Success")
-    console.log(parse)
-}
-/*
+
 r1.question("Type in your code to parse: ", (answer : string) => {
 
     // console.log(parse(answer).get());
-    console.time("start");
-    let outcome = a(new CharStream(answer));
-    console.timeEnd("start");
+    console.time("time");
+    let outcome = multiParser(new CharStream(answer));
+    console.timeEnd("time");
     //console.log("assignParser");
     //Prims.LCSParse(listParser, 0, new CharStream(answer));
     // console.log("betweenParser");
     // Prims.LCSParse(betweenParser, 0, new CharStream("(2222222 "));
-    console.log(outcome);
     if (outcome instanceof Prims.Failure) {
-        console.log(Prims.editParse(a,new CharStream(answer),0,outcome.error.expectedStr().length,[]));
-        console.log(outcome.error.toString());
-        console.log(new Translator(outcome.error).toString());
+        console.log(outcome.errors[0].modStream.input);
+        console.log(outcome.errors[0].edit);
     }
     
     //let outcome = Prims.strSat(["hello","hi"])(new CharStream("hiytutuy"));
@@ -219,4 +201,3 @@ r1.question("Type in your code to parse: ", (answer : string) => {
     r1.close();
 }
 );
-*/
